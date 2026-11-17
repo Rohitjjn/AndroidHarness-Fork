@@ -104,6 +104,24 @@ jobs:
           if-no-files-found: error
           retention-days: 30
 
+      # GitHub blob storage is not always reachable from every sandbox, so the
+      # failure text is mirrored into check-run annotations, which the API
+      # returns inline.
+      - name: Surface build errors as annotations
+        if: always()
+        run: |
+          shopt -s nullglob
+          for log in ci-out/logs/*.log; do
+            echo "::group::$log"
+            grep -nE "^e: |error:|Execution failed|> Task .*FAILED|Caused by:" "$log" | tail -25 | while IFS= read -r line; do
+              text="${line//'%'/'%25'}"
+              text="${text//$'\n'/'%0A'}"
+              text="${text//$'\r'/'%0D'}"
+              echo "::error::${text:0:900}"
+            done
+            echo "::endgroup::"
+          done
+
       - name: Upload build logs
         if: always()
         uses: actions/upload-artifact@v7
