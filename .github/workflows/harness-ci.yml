@@ -1,0 +1,156 @@
+name: Harness Code CI
+
+# Runs on every pull request and on demand. Lint, unit tests, the debug and
+# release APKs, and the artefacts a reviewer needs (APKs + test reports).
+# The screenshots are produced by the instrumented test sources in
+# app/src/androidTest; that job needs an emulator and is opt-in via the
+# `ui-tests` label or manual dispatch, so an ordinary PR stays fast.
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      run_ui_tests:
+        description: "Also run the instrumented Compose UI tests on an emulator"
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: harness-ci-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Lint, test and assemble
+    runs-on: ubuntu-latest
+    timeout-minutes: 75
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: Set up Gradle (caching)
+        uses: gradle/actions/setup-gradle@v6
+
+      # AGP refuses to configure with the pinned NDK missing.
+      - name: Install pinned NDK
+        run: "${ANDROID_HOME:-/usr/local/lib/android/sdk}/cmdline-tools/latest/bin/sdkmanager --install 'ndk;27.2.12479018'"
+
+      - name: Install Vulkan shader compiler
+        run: sudo apt-get update && sudo apt-get install -y glslc
+
+      - name: Unit tests
+        run: ./gradlew :app:testDebugUnitTest --no-daemon --stacktrace
+
+      - name: Lint (debug variant)
+        run: ./gradlew :app:lintDebug --no-daemon --stacktrace -Dlint.baselines.continue=true
+
+      - name: Assemble debug APK
+        run: ./gradlew :app:assembleDebug --no-daemon --stacktrace
+
+      - name: Assemble release APK
+        env:
+          HARNESS_KEYSTORE_BASE64: ${{ secrets.HARNESS_KEYSTORE_BASE64 }}
+          HARNESS_KEYSTORE_PASSWORD: ${{ secrets.HARNESS_KEYSTORE_PASSWORD }}
+          HARNESS_KEY_ALIAS: ${{ secrets.HARNESS_KEY_ALIAS }}
+          HARNESS_KEY_PASSWORD: ${{ secrets.HARNESS_KEY_PASSWORD }}
+        run: ./gradlew :app:assembleRelease --no-daemon --stacktrace
+
+      - name: Name artefacts by signing state
+        run: |
+          mkdir -p ci-out
+          if [ -n "${HARNESS_KEYSTORE_BASE64:-}" ]; then LABEL="signed"; else LABEL="test-signed"; fi
+          for variant in debug release; do
+            for apk in app/build/outputs/apk/$variant/*.apk; do
+              [ -e "$apk" ] || continue
+              cp "$apk" "ci-out/harness-code-${variant}-${LABEL}-$(basename "$apk")"
+            done
+          done
+          ls -la ci-out
+        env:
+          HARNESS_KEYSTORE_BASE64: ${{ secrets.HARNESS_KEYSTORE_BASE64 }}
+
+      - name: Upload APKs
+        uses: actions/upload-artifact@v7
+        with:
+          name: harness-code-apks
+          path: ci-out/*.apk
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Upload unit test report
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: unit-test-report
+          path: |
+            app/build/reports/tests/testDebugUnitTest
+            app/build/test-results/testDebugUnitTest
+          retention-days: 14
+
+      - name: Upload lint report
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: lint-report
+          path: app/build/reports/lint-results-debug.*
+          retention-days: 14
+
+  ui-tests:
+    name: Compose UI tests (emulator)
+    if: github.event_name == 'workflow_dispatch' && inputs.run_ui_tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: Set up Gradle (caching)
+        uses: gradle/actions/setup-gradle@v6
+
+      - name: Install pinned NDK
+        run: "${ANDROID_HOME:-/usr/local/lib/android/sdk}/cmdline-tools/latest/bin/sdkmanager --install 'ndk;27.2.12479018'"
+
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - name: Run instrumented tests and pull screenshots
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          target: google_apis
+          arch: x86_64
+          disable-animations: true
+          script: |
+            mkdir -p ci-screens
+            ./gradlew :app:connectedDebugAndroidTest --no-daemon --stacktrace || STATUS=$?
+            adb shell run-as com.harnesscode.app.debug ls /sdcard/Download 2>/dev/null || true
+            adb pull /sdcard/Download ci-screens 2>/dev/null || true
+            exit ${STATUS:-0}
+
+      - name: Upload screenshots
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: ui-screenshots
+          path: ci-screens
+          if-no-files-found: warn
+          retention-days: 30

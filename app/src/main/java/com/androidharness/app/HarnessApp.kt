@@ -306,6 +306,15 @@ class AppContainer(val appContext: Context) {
         },
     )
     val browser = com.androidharness.app.browser.BrowserController(appContext, images)
+    /**
+     * Worktrees live in app-private storage: always writable, never on a
+     * scoped-storage path Git refuses to exec in.
+     */
+    val worktrees = com.androidharness.app.workspace.WorktreeManager(
+        router = shellRouter,
+        workspace = workspace,
+        root = java.io.File(appContext.filesDir, "worktrees"),
+    )
     val registry = ToolRegistry.default(
         fetchClient, todoStore, backgroundProcesses, linuxEnv, shizuku, shellRouter, skills, codeGraph,
         imageStore = images,
@@ -322,6 +331,7 @@ class AppContainer(val appContext: Context) {
         pullRequests = { githubRepositories },
         sessionMessages = { sessions.messages(it) },
         appSettings = settings,
+        worktrees = worktrees,
     )
     val mcp = com.androidharness.app.tools.mcp.McpManager(appContext, linuxEnv, keys, codeGraph, configuration)
     val github = com.androidharness.app.github.GitHubAuth(BuildConfig.GITHUB_CLIENT_ID,
@@ -403,6 +413,13 @@ class AppContainer(val appContext: Context) {
         canRun = runtimePolicy::canRun,
     )
     val githubRepositories = com.androidharness.app.github.GitHubWorkspaces(this)
+    private val githubApi = com.androidharness.app.github.GitHubApi()
+    /** Read-only PR monitoring; the fix action is an ordinary agent prompt. */
+    val pullRequestMonitor = com.androidharness.app.github.PullRequestMonitor(
+        api = githubApi,
+        github = githubRepositories,
+        requests = com.androidharness.app.github.GitHubPullRequests(githubApi),
+    )
     val automation = com.androidharness.app.automation.AutomationManager(this)
     val projectDeletion = com.androidharness.app.workspace.ProjectDeletion(this)
     internal var telegram = com.androidharness.app.telegram.TelegramManager(this)

@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="ic_launcher_background">#1B1B1F</color>
+    <!-- Warm paper behind the launcher mark; matches the app's light background. -->
+    <color name="ic_launcher_background">#F3EDE3</color>
+    <color name="harness_splash_background">#F3EDE3</color>
 </resources>
