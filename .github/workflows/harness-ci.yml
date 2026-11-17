@@ -48,22 +48,39 @@ jobs:
       - name: Install Vulkan shader compiler
         run: sudo apt-get update && sudo apt-get install -y glslc
 
+      # Each step tees its output to ci-out/logs so a failure can be read back
+      # as an artifact even when the runner's log blob is unreachable.
       - name: Unit tests
-        run: ./gradlew :app:testDebugUnitTest --no-daemon --stacktrace
+        run: |
+          mkdir -p ci-out/logs
+          set -o pipefail
+          ./gradlew :app:testDebugUnitTest --no-daemon --stacktrace 2>&1 | tee ci-out/logs/unit-tests.log
 
       - name: Lint (debug variant)
-        run: ./gradlew :app:lintDebug --no-daemon --stacktrace -Dlint.baselines.continue=true
+        if: always()
+        run: |
+          mkdir -p ci-out/logs
+          set -o pipefail
+          ./gradlew :app:lintDebug --no-daemon --stacktrace -Dlint.baselines.continue=true 2>&1 | tee ci-out/logs/lint.log
 
       - name: Assemble debug APK
-        run: ./gradlew :app:assembleDebug --no-daemon --stacktrace
+        if: always()
+        run: |
+          mkdir -p ci-out/logs
+          set -o pipefail
+          ./gradlew :app:assembleDebug --no-daemon --stacktrace 2>&1 | tee ci-out/logs/assemble-debug.log
 
       - name: Assemble release APK
+        if: always()
         env:
           HARNESS_KEYSTORE_BASE64: ${{ secrets.HARNESS_KEYSTORE_BASE64 }}
           HARNESS_KEYSTORE_PASSWORD: ${{ secrets.HARNESS_KEYSTORE_PASSWORD }}
           HARNESS_KEY_ALIAS: ${{ secrets.HARNESS_KEY_ALIAS }}
           HARNESS_KEY_PASSWORD: ${{ secrets.HARNESS_KEY_PASSWORD }}
-        run: ./gradlew :app:assembleRelease --no-daemon --stacktrace
+        run: |
+          mkdir -p ci-out/logs
+          set -o pipefail
+          ./gradlew :app:assembleRelease --no-daemon --stacktrace 2>&1 | tee ci-out/logs/assemble-release.log
 
       - name: Name artefacts by signing state
         run: |
@@ -86,6 +103,15 @@ jobs:
           path: ci-out/*.apk
           if-no-files-found: error
           retention-days: 30
+
+      - name: Upload build logs
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: build-logs
+          path: ci-out/logs
+          if-no-files-found: warn
+          retention-days: 14
 
       - name: Upload unit test report
         if: always()
