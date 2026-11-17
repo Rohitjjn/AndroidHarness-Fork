@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.androidharness.app.agent.AgentMode
 import com.androidharness.app.agent.PermissionMode
 import com.androidharness.app.agent.session.AgentSession
@@ -124,7 +125,9 @@ class ChatAgentSession(
 fun rememberChatAgentSession(viewModel: ChatViewModel): AgentSession {
     val scope = rememberCoroutineScope()
     val extras = remember(viewModel) { MutableStateFlow(HarnessSessionMapper.Extras()) }
-    val sessionId = viewModel.state.value.sessionId
+    // Collected, not read: reading a StateFlow inside composition is a lint
+    // error and would not recompose when the open conversation changes.
+    val sessionId = viewModel.state.collectAsStateWithLifecycle().value.sessionId
     LaunchedEffect(viewModel, sessionId) {
         extras.value = HarnessSessionMapper.Extras()
         if (sessionId == null) return@LaunchedEffect
