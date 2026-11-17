@@ -155,47 +155,52 @@ jobs:
           if-no-files-found: warn
           retention-days: 30
 
-      - name: Surface build errors (slice 1)
+      # The runner's log blob is not reachable from every environment, so the
+      # interesting part of each failure is copied into check-run annotations
+      # (10 per step, hence the slices).
+      - name: Collect failure text
         if: always()
         run: |
-          shopt -s nullglob
-          cat ci-out/logs/*.log 2>/dev/null | grep -E "^e: |error:|Execution failed|What went wrong" | sed -n '1,10p' | while IFS= read -r line; do
-            text="${line//'%'/'%25'}"
-            text="${text//$'\n'/'%0A'}"
-            text="${text//$'\r'/'%0D'}"
+          mkdir -p ci-out
+          : > ci-out/failures.txt
+          for f in ci-out/logs/*.log; do
+            [ -f "$f" ] || continue
+            echo "##### $f" >> ci-out/failures.txt
+            grep -nE "What went wrong|Could not resolve|Could not find|> Task .*FAILED|^e: |FAILURE: Build failed|Caused by:" "$f" | head -30 >> ci-out/failures.txt || true
+            awk '/What went wrong/{flag=1} flag' "$f" | head -18 >> ci-out/failures.txt || true
+          done
+          wc -l ci-out/failures.txt
+          cat ci-out/failures.txt
+
+      - name: Surface build errors (1)
+        if: always()
+        run: |
+          sed -n '1,10p' ci-out/failures.txt 2>/dev/null | while IFS= read -r line; do
+            text="${line//'%'/'%25'}"; text="${text//$'\n'/'%0A'}"; text="${text//$'\r'/'%0D'}"
             echo "::error::${text:0:900}"
           done
 
-      - name: Surface build errors (slice 2)
+      - name: Surface build errors (2)
         if: always()
         run: |
-          shopt -s nullglob
-          cat ci-out/logs/*.log 2>/dev/null | grep -E "^e: |error:|Execution failed|What went wrong" | sed -n '11,20p' | while IFS= read -r line; do
-            text="${line//'%'/'%25'}"
-            text="${text//$'\n'/'%0A'}"
-            text="${text//$'\r'/'%0D'}"
+          sed -n '11,20p' ci-out/failures.txt 2>/dev/null | while IFS= read -r line; do
+            text="${line//'%'/'%25'}"; text="${text//$'\n'/'%0A'}"; text="${text//$'\r'/'%0D'}"
             echo "::error::${text:0:900}"
           done
 
-      - name: Surface build errors (slice 3)
+      - name: Surface build errors (3)
         if: always()
         run: |
-          shopt -s nullglob
-          cat ci-out/logs/*.log 2>/dev/null | grep -E "^e: |error:|Execution failed|What went wrong" | sed -n '21,30p' | while IFS= read -r line; do
-            text="${line//'%'/'%25'}"
-            text="${text//$'\n'/'%0A'}"
-            text="${text//$'\r'/'%0D'}"
+          sed -n '21,30p' ci-out/failures.txt 2>/dev/null | while IFS= read -r line; do
+            text="${line//'%'/'%25'}"; text="${text//$'\n'/'%0A'}"; text="${text//$'\r'/'%0D'}"
             echo "::error::${text:0:900}"
           done
 
-      - name: Surface build errors (slice 4)
+      - name: Surface build errors (4)
         if: always()
         run: |
-          shopt -s nullglob
-          cat ci-out/logs/*.log 2>/dev/null | grep -E "^e: |error:|Execution failed|What went wrong" | sed -n '31,40p' | while IFS= read -r line; do
-            text="${line//'%'/'%25'}"
-            text="${text//$'\n'/'%0A'}"
-            text="${text//$'\r'/'%0D'}"
+          sed -n '31,40p' ci-out/failures.txt 2>/dev/null | while IFS= read -r line; do
+            text="${line//'%'/'%25'}"; text="${text//$'\n'/'%0A'}"; text="${text//$'\r'/'%0D'}"
             echo "::error::${text:0:900}"
           done
 
