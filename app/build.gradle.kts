@@ -166,6 +166,11 @@ android {
         // count and the first findings as annotations, and treats errors in the
         // files this fork adds as a failure (see .github/workflows/harness-ci.yml).
         abortOnError = false
+        // Lint's test-source models crash on this AGP/lint version (a
+        // configuration-cache serialisation bug in LintModelWriterTask), so the
+        // report covers app sources only.
+        checkTestSources = false
+        checkDependencies = false
     }
 
     compileOptions {
@@ -295,6 +300,9 @@ dependencies {
     androidTestImplementation(libs.androidx.test.core)
     androidTestImplementation(libs.androidx.test.ext.junit)
     // Compose UI test rule for the harness screenshot sheet (ui-tests CI job).
+    // androidTest configurations do not inherit the `implementation` platform,
+    // so the BOM has to be added here too.
+    androidTestImplementation(platform(libs.compose.bom))
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
 }

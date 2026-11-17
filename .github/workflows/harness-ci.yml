@@ -75,7 +75,7 @@ jobs:
         run: |
           mkdir -p ci-out/logs
           set -o pipefail
-          ./gradlew :app:lintDebug --no-daemon --stacktrace 2>&1 | tee ci-out/logs/lint.log
+          ./gradlew :app:lintDebug --no-daemon --no-configuration-cache --stacktrace 2>&1 | tee ci-out/logs/lint.log
 
       - name: Report lint findings
         if: always()
