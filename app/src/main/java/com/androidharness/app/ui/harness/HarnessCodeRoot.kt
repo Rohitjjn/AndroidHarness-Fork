@@ -33,7 +33,7 @@ import androidx.compose.material.icons.outlined.Memory
 import androidx.compose.material.icons.outlined.Schedule
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.outlined.Smartphone
-import androidx.compose.material.icons.outlined.Splitscreen
+import androidx.compose.material.icons.outlined.Layers
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -509,7 +509,7 @@ internal object HarnessIcons {
     val Settings = Icons.Outlined.Settings
     val Labs = Icons.Outlined.Smartphone
     val About = Icons.Outlined.Info
-    val Parallel = Icons.Outlined.Splitscreen
+    val Parallel = Icons.Outlined.Layers
     val Today = Icons.Outlined.CalendarToday
     val New = Icons.Filled.Add
     val Memory = Icons.Outlined.Memory

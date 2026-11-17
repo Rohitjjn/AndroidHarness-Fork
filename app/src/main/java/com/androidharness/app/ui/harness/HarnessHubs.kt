@@ -25,7 +25,7 @@ import androidx.compose.material.icons.outlined.Description
 import androidx.compose.material.icons.outlined.Folder
 import androidx.compose.material.icons.outlined.Memory
 import androidx.compose.material.icons.outlined.Schedule
-import androidx.compose.material.icons.outlined.Splitscreen
+import androidx.compose.material.icons.outlined.Layers
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -248,7 +248,7 @@ fun HarnessParallelScreen(
                         Text(session.title.ifBlank { "Untitled session" }, style = MaterialTheme.typography.bodyMedium, color = HarnessTheme.palette.text, maxLines = 1, overflow = TextOverflow.Ellipsis)
                         Text("Working…", style = MaterialTheme.typography.labelSmall, color = HarnessTheme.palette.muted)
                     }
-                    Icon(Icons.Outlined.Splitscreen, contentDescription = null, tint = HarnessTheme.palette.faint, modifier = Modifier.size(16.dp))
+                    Icon(Icons.Outlined.Layers, contentDescription = null, tint = HarnessTheme.palette.faint, modifier = Modifier.size(16.dp))
                 }
             }
             item {
@@ -321,7 +321,7 @@ fun HarnessSettingsScreen(
             SettingsRow("All settings", "Search every setting, including advanced ones", Icons.Outlined.Description, onOpenAllSettings)
             SettingsRow("Providers & models", "API keys, endpoints, fallbacks", Icons.Outlined.Memory, onOpenProviders)
             SettingsRow("Skills", "Installed skills and their switches", Icons.Outlined.Schedule, onOpenSkills)
-            SettingsRow("Permissions", "Permission mode, approvals and remembered grants", Icons.Outlined.Splitscreen, onOpenAllSettings)
+            SettingsRow("Permissions", "Permission mode, approvals and remembered grants", Icons.Outlined.Layers, onOpenAllSettings)
             Spacer(Modifier.height(Space.xl))
 
             SectionLabel("MORE")
@@ -438,7 +438,8 @@ fun HarnessAboutScreen(onBack: () -> Unit) {
                 Column {
                     Text("Harness Code", style = MaterialTheme.typography.displaySmall, color = HarnessTheme.palette.text)
                     Text(
-                        "Version ${com.androidharness.app.BuildConfig.VERSION_NAME} (${com.androidharness.app.BuildConfig.VERSION_CODE})",
+                        "Version ${com.androidharness.app.BuildConfig.VERSION_NAME} (${com.androidharness.app.BuildConfig.VERSION_CODE}) · " +
+                            "${com.androidharness.app.BuildConfig.SIGNING_LABEL}",
                         style = MaterialTheme.typography.labelSmall,
                         color = HarnessTheme.palette.muted,
                     )

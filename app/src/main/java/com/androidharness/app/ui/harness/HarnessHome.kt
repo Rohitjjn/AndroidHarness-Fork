@@ -21,7 +21,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.outlined.Splitscreen
+import androidx.compose.material.icons.outlined.Layers
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -202,7 +202,7 @@ fun HarnessHomeScreen(
                             Text("Working…", style = MaterialTheme.typography.labelSmall, color = palette.muted)
                         }
                         Icon(
-                            Icons.Outlined.Splitscreen,
+                            Icons.Outlined.Layers,
                             contentDescription = null,
                             tint = palette.faint,
                             modifier = Modifier.size(16.dp),

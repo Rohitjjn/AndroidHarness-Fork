@@ -161,6 +161,11 @@ android {
         // HarnessUserService.kt), an AGP/lint bug, not a lint finding. Skip
         // the release lint gate until the toolchain bug is fixed.
         checkReleaseBuilds = false
+        // The upstream codebase has never been linted (1142 files), so the task
+        // reports findings instead of failing the build. CI surfaces the error
+        // count and the first findings as annotations, and treats errors in the
+        // files this fork adds as a failure (see .github/workflows/harness-ci.yml).
+        abortOnError = false
     }
 
     compileOptions {
