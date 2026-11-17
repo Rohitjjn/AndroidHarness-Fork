@@ -243,7 +243,7 @@ class HarnessSessionMapperTest {
     }
 
     @Test fun contextFractionIsClamped() {
-        val mapped = HarnessSessionMapper.map(ChatUiState(maxContextTokens = 1000, usage = com.androidharness.app.ui.chat.UsageStats(lastInput = 2000)))
+        val mapped = HarnessSessionMapper.map(ChatUiState(maxContextTokens = 1000, usage = com.androidharness.app.ui.chat.UsageStats(lastInput = 2000L)))
         assertEquals(1f, mapped.contextFraction, 0.001f)
     }
 

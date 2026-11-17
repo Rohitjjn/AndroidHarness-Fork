@@ -139,7 +139,7 @@ class WorktreeManager(
         }
 
         val path = worktreePath(root.absolutePath, branch)
-        File(root).mkdirs()
+        root.mkdirs()
         val createBranch = existing.none { it.branch == branch } &&
             !branchExists(fs, branch)
         val add = run(fs, addCommand(path, branch, createBranch))
@@ -173,7 +173,7 @@ class WorktreeManager(
      */
     suspend fun remove(fs: WorkspaceFs, path: String, force: Boolean = false): Result = withContext(Dispatchers.IO) {
         val target = File(path).canonicalFile
-        val managed = runCatching { File(root.absoluteFile).canonicalFile }.getOrNull()
+        val managed = runCatching { root.canonicalFile }.getOrNull()
         if (managed == null || !target.path.startsWith(managed.path + File.separator)) {
             return@withContext Result(false, "Only worktrees created by Harness Code can be removed from here.")
         }

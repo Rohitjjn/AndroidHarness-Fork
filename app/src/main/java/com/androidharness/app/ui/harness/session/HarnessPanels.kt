@@ -322,6 +322,7 @@ private fun FilesPanel(container: AppContainer, state: HarnessSessionState, onCl
         }
     }
     var open by remember { mutableStateOf<Pair<String, String>?>(null) }
+    val scope = rememberCoroutineScope()
     Column(Modifier.fillMaxSize()) {
         PanelHeader(open?.first ?: "Files", onClose = { if (open != null) open = null else onClose() })
         val current = open
@@ -335,7 +336,7 @@ private fun FilesPanel(container: AppContainer, state: HarnessSessionState, onCl
             return@Column
         }
         Column(Modifier.padding(horizontal = Space.md)) {
-            com.androidharness.app.ui.harness.components.DrawerSearch(query) { query = it }
+            com.androidharness.app.ui.harness.DrawerSearch(query) { query = it }
         }
         val visible = files.filter { query.isBlank() || it.path.contains(query, true) }
         if (visible.isEmpty()) {
@@ -348,9 +349,15 @@ private fun FilesPanel(container: AppContainer, state: HarnessSessionState, onCl
                     Modifier
                         .fillMaxWidth()
                         .clickable {
-                            open = file.path to runCatching {
-                                container.workspace.forSession(state.sessionId!!).resolve(file.path).readText().take(200_000)
-                            }.getOrElse { "This file could not be read." }
+                            val sessionId = state.sessionId ?: return@clickable
+                            scope.launch {
+                                val text = withContext(Dispatchers.IO) {
+                                    runCatching {
+                                        container.workspace.forSession(sessionId).resolve(file.path).readText().take(200_000)
+                                    }.getOrElse { "This file could not be read." }
+                                }
+                                open = file.path to text
+                            }
                         }
                         .padding(horizontal = Space.md, vertical = Space.sm),
                 ) {
@@ -417,16 +424,19 @@ private fun PreviewPanel(container: AppContainer, state: HarnessSessionState, on
     val context = LocalContext.current
     var url by remember { mutableStateOf("http://localhost:3000") }
     var loaded by remember { mutableStateOf<String?>(null) }
-    var htmlFiles by remember { mutableStateOf(listOf<String>()) }
+    var htmlFiles by remember { mutableStateOf(listOf<Pair<String, String>>()) }
     LaunchedEffect(state.sessionId) {
-        if (state.sessionId != null) {
-            htmlFiles = withContext(Dispatchers.IO) {
-                runCatching {
-                    container.workspace.forSession(state.sessionId).walk("")
-                        .filter { it.isFile && (it.name.endsWith(".html") || it.name.endsWith(".htm")) }
-                        .map { it.relPath }.take(20).toList()
-                }.getOrElse { emptyList() }
-            }
+        val sessionId = state.sessionId ?: return@LaunchedEffect
+        htmlFiles = withContext(Dispatchers.IO) {
+            runCatching {
+                val fs = container.workspace.forSession(sessionId)
+                val root = fs.shellRoot
+                fs.walk("")
+                    .filter { it.isFile && (it.name.endsWith(".html") || it.name.endsWith(".htm")) }
+                    .take(20)
+                    .mapNotNull { node -> root?.let { java.io.File(it, node.relPath) }?.let { node.relPath to "file://" + it.absolutePath } }
+                    .toList()
+            }.getOrElse { emptyList() }
         }
     }
     Column(Modifier.fillMaxSize()) {
@@ -449,9 +459,9 @@ private fun PreviewPanel(container: AppContainer, state: HarnessSessionState, on
         if (htmlFiles.isNotEmpty()) {
             Row(Modifier.fillMaxWidth().padding(Space.sm), horizontalArrangement = Arrangement.spacedBy(Space.sm)) {
                 for (file in htmlFiles.take(2)) {
-                    Pill(label = file.substringAfterLast('/'), onClick = {
-                        val path = withContextPath(container, state, file)
-                        if (path != null) { url = path; loaded = path }
+                    Pill(label = file.first.substringAfterLast('/'), onClick = {
+                        url = file.second
+                        loaded = file.second
                     })
                 }
             }
@@ -477,13 +487,6 @@ private fun PreviewPanel(container: AppContainer, state: HarnessSessionState, on
             )
         }
     }
-}
-
-/** file:// address for a workspace file, or null for SAF/SSH workspaces. */
-private fun withContextPath(container: AppContainer, state: HarnessSessionState, relPath: String): String? {
-    val root = runCatching { container.workspace.forSession(state.sessionId!!).shellRoot }.getOrNull() ?: return null
-    val file = java.io.File(root, relPath)
-    return "file://" + file.absolutePath
 }
 
 /* -------------------------------------------------------------- Worktree */

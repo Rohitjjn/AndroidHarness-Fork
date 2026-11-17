@@ -106,20 +106,49 @@ jobs:
 
       # GitHub blob storage is not always reachable from every sandbox, so the
       # failure text is mirrored into check-run annotations, which the API
-      # returns inline.
-      - name: Surface build errors as annotations
+      # returns inline. Ten annotations per step, so the slices are separate.
+      - name: Surface build errors (slice 1)
         if: always()
         run: |
           shopt -s nullglob
-          for log in ci-out/logs/*.log; do
-            echo "::group::$log"
-            grep -nE "^e: |error:|Execution failed|> Task .*FAILED|Caused by:" "$log" | tail -25 | while IFS= read -r line; do
-              text="${line//'%'/'%25'}"
-              text="${text//$'\n'/'%0A'}"
-              text="${text//$'\r'/'%0D'}"
-              echo "::error::${text:0:900}"
-            done
-            echo "::endgroup::"
+          cat ci-out/logs/*.log 2>/dev/null | grep -E "^e: |error:|Execution failed|What went wrong" | sed -n '1,10p' | while IFS= read -r line; do
+            text="${line//'%'/'%25'}"
+            text="${text//$'\n'/'%0A'}"
+            text="${text//$'\r'/'%0D'}"
+            echo "::error::${text:0:900}"
+          done
+
+      - name: Surface build errors (slice 2)
+        if: always()
+        run: |
+          shopt -s nullglob
+          cat ci-out/logs/*.log 2>/dev/null | grep -E "^e: |error:|Execution failed|What went wrong" | sed -n '11,20p' | while IFS= read -r line; do
+            text="${line//'%'/'%25'}"
+            text="${text//$'\n'/'%0A'}"
+            text="${text//$'\r'/'%0D'}"
+            echo "::error::${text:0:900}"
+          done
+
+      - name: Surface build errors (slice 3)
+        if: always()
+        run: |
+          shopt -s nullglob
+          cat ci-out/logs/*.log 2>/dev/null | grep -E "^e: |error:|Execution failed|What went wrong" | sed -n '21,30p' | while IFS= read -r line; do
+            text="${line//'%'/'%25'}"
+            text="${text//$'\n'/'%0A'}"
+            text="${text//$'\r'/'%0D'}"
+            echo "::error::${text:0:900}"
+          done
+
+      - name: Surface build errors (slice 4)
+        if: always()
+        run: |
+          shopt -s nullglob
+          cat ci-out/logs/*.log 2>/dev/null | grep -E "^e: |error:|Execution failed|What went wrong" | sed -n '31,40p' | while IFS= read -r line; do
+            text="${line//'%'/'%25'}"
+            text="${text//$'\n'/'%0A'}"
+            text="${text//$'\r'/'%0D'}"
+            echo "::error::${text:0:900}"
           done
 
       - name: Upload build logs
