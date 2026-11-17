@@ -89,8 +89,10 @@ the behaviour really matches**; otherwise keep the AndroidHarness name.
 
 ## Verification status (what CI actually ran)
 
-Last verified commit: `1599da7` on `arena/4a121b73-androidharness-fork`, run
-[44051801529](https://github.com/Rohitjjn/AndroidHarness-Fork/actions/runs/44051801529) — **success**.
+Green runs on this branch:
+
+* [`44051801529`](https://github.com/Rohitjjn/AndroidHarness-Fork/actions/runs/44051801529) — commit `1599da7`, success, and the run that published the pre-release.
+* [`44065011482`](https://github.com/Rohitjjn/AndroidHarness-Fork/actions/runs/44065011482) — commit `512efe2`, success, same job and numbers as below.
 
 | Check | Result |
 | --- | --- |
@@ -125,6 +127,11 @@ Last verified commit: `1599da7` on `arena/4a121b73-androidharness-fork`, run
   `HarnessScreenshotDeviceTest`, which writes PNGs to
   `Download/HarnessCodeScreens` and uploads them as `ui-screenshots`; that job
   was **not** run for this branch.
+* **One pre-existing test is flaky.** `com.androidharness.app.llm.SseStreamTest` —
+  "stop cancels while waiting for headers, body or an unfinished event" — failed on one run of
+  commit `512efe2` and passed on the push run of the same commit (and on the run before it). It is
+  upstream SSE-cancellation timing code and is untouched by this branch; the CI annotations name the
+  failing case, so a red run is diagnosable.
 * Release signing falls back to the debug key (artefacts are named
   `test-signed`) until `HARNESS_KEYSTORE_BASE64`, `HARNESS_KEYSTORE_PASSWORD`,
   `HARNESS_KEY_ALIAS` and `HARNESS_KEY_PASSWORD` exist as repository secrets.
