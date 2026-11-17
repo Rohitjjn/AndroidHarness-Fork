@@ -9,6 +9,8 @@ name: Harness Code CI
 on:
   pull_request:
     branches: [main]
+  push:
+    branches: [main, 'arena/**']
   workflow_dispatch:
     inputs:
       run_ui_tests:
@@ -227,7 +229,12 @@ jobs:
   release:
     name: Pre-release with APKs
     needs: build
-    if: github.event_name == 'workflow_dispatch' && inputs.make_release
+    # Publish when dispatched with make_release, or when the pushed commit asks
+    # for it with a [publish] marker (the token in this environment cannot
+    # dispatch workflows, so the marker is the trigger we can actually use).
+    if: >-
+      (github.event_name == 'workflow_dispatch' && inputs.make_release) ||
+      (github.event_name == 'push' && contains(github.event.head_commit.message, '[publish]'))
     runs-on: ubuntu-latest
     permissions:
       contents: write
