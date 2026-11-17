@@ -126,6 +126,15 @@ jobs:
           else
             echo "::warning::No unit test results were produced."
           fi
+          # Name the failing cases, so a red run is readable from annotations.
+          for f in app/build/test-results/testDebugUnitTest/*.xml; do
+            [ -f "$f" ] || continue
+            grep -qE "<failure|<error" "$f" || continue
+            echo "::error::FAILING SUITE $(basename "$f" .xml)"
+            grep -B1 -E "<failure|<error" "$f" | grep -o 'testcase name="[^"]*"' | head -3 | while IFS= read -r name; do
+              echo "::error::FAILED TEST $name"
+            done
+          done
           found=0
           for f in app/build/outputs/apk/debug/*.apk app/build/outputs/apk/release/*.apk; do
             [ -f "$f" ] || continue
