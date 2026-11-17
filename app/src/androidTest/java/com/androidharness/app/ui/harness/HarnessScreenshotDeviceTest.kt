@@ -63,12 +63,7 @@ class HarnessScreenshotDeviceTest {
     private fun capture(name: String, dark: Boolean, fontScale: Float) {
         compose.setContent {
             HarnessCodeTheme(dark = dark) {
-                androidx.compose.runtime.CompositionLocalProvider(
-                    androidx.compose.ui.platform.LocalDensity provides
-                        androidx.compose.ui.unit.Density(compose.density.density, fontScale),
-                ) {
-                    ComponentSheet()
-                }
+                ScaledContent(fontScale) { ComponentSheet() }
             }
         }
         compose.waitForIdle()
@@ -93,6 +88,18 @@ class HarnessScreenshotDeviceTest {
             values.put(MediaStore.Downloads.IS_PENDING, 0)
             context.contentResolver.update(uri, values, null, null)
         }
+    }
+}
+
+/** Applies a font scale without touching the device settings. */
+@androidx.compose.runtime.Composable
+private fun ScaledContent(fontScale: Float, content: @androidx.compose.runtime.Composable () -> Unit) {
+    val density = androidx.compose.ui.platform.LocalDensity.current
+    androidx.compose.runtime.CompositionLocalProvider(
+        androidx.compose.ui.platform.LocalDensity provides
+            androidx.compose.ui.unit.Density(density.density, fontScale),
+    ) {
+        content()
     }
 }
 
