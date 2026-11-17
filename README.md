@@ -1,12 +1,64 @@
 <div align="center">
 
-<img src=".github/assets/icon.png" alt="AndroidHarness icon" width="120">
+<img src=".github/assets/icon.png" alt="Harness Code icon" width="120">
 
-# AndroidHarness
+# Harness Code
 
-**An AI coding agent and chat assistant that runs on your Android phone.**
+**A coding agent with a terminal-assistant feel, running entirely on your Android phone.**
 
-No PC needed. No root needed.
+A personal, rebranded fork of [AndroidHarness](https://github.com/Sanuu7/AndroidHarness).
+Same engine, same providers, new shell.
+
+</div>
+
+> **Harness Code is an unofficial personal project, not affiliated with Anthropic.**
+> It reuses the *shape* of a terminal coding assistant — a session transcript, tool cards,
+> diffs, permissions and plans — with its own palette, typefaces, icons and copy. It
+> contains no code, assets, icons, fonts or trademarks from Anthropic's apps.
+
+## What this fork changes
+
+- **A new app shell.** A drawer/sidebar with sessions grouped Today / Yesterday / Earlier
+  (pin, archive), a welcome screen with suggestions, a session screen built around the
+  transcript, and side panels for diff review, files, terminal, build & test, preview,
+  rewind, worktrees and pull requests.
+- **A new design system.** Warm paper light theme, warm ink dark theme, one clay accent,
+  Newsreader + Inter + JetBrains Mono (all OFL), hairline borders instead of shadows.
+- **New agent features.** Git worktree isolation (`worktree_create`, `worktree_remove`,
+  `worktree_list`), parallel sessions, inline diff review comments, pull-request status
+  monitoring with a "fix failing checks" action, and a read-only hooks viewer.
+- **Its own identity.** Launcher label "Harness Code", an original adaptive icon
+  (foreground, background, monochrome), and the application id `com.harnesscode.app`, so it
+  installs next to the original AndroidHarness.
+- **Nothing was removed.** Chat, local models, Telegram, FTP/SFTP, 9Router, Canvas, glass,
+  root/Shizuku/ADB, key rotation, proxies, fallbacks and the rest live under
+  **Labs & Device**. The original interface is one tap away in Settings → *Classic Harness UI*.
+
+Design notes live in [`docs/harness-code/`](docs/harness-code):
+[ARCHITECTURE](docs/harness-code/ARCHITECTURE.md) ·
+[DESIGN](docs/harness-code/DESIGN.md) ·
+[PARITY](docs/harness-code/PARITY.md) ·
+[SKILLS](docs/harness-code/SKILLS.md).
+
+Pre-release APKs: [`harness-code-v1.0.0`](https://github.com/Rohitjjn/AndroidHarness-Fork/releases/tag/harness-code-v1.0.0)
+(CI-signed with the debug key, therefore labelled **test-signed**).
+
+## Building
+
+```bash
+./gradlew :app:assembleDebug        # com.harnesscode.app.debug
+./gradlew :app:assembleRelease      # test-signed unless the keystore secrets exist
+./gradlew :app:testDebugUnitTest    # JVM tests, including the new harness suites
+```
+
+Release signing reads `HARNESS_KEYSTORE_BASE64`, `HARNESS_KEYSTORE_PASSWORD`,
+`HARNESS_KEY_ALIAS` and `HARNESS_KEY_PASSWORD` from the environment. Without them the APK
+is signed with the debug key and labels itself **test-signed** in About and in the CI
+artifact name.
+
+---
+
+## Upstream AndroidHarness
 
 <p>
   <a href="https://github.com/Sanuu7/AndroidHarness/releases/latest"><img src=".github/assets/download-from-github.png" alt="Download from GitHub" height="54"></a>

@@ -1,0 +1,538 @@
+<!doctype html>
+<!--
+  Harness Code — design board.
+  Hand-built from the Compose layout code and the tokens in
+  ui/harness/theme/HarnessCodeTheme.kt, so reviewers can see the intent without
+  installing an APK. This is a layout board, not a device screenshot.
+  Fonts: Newsreader / Inter / JetBrains Mono, SIL OFL 1.1 (see ../../../app/src/main/assets/licenses).
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Harness Code — design board</title>
+<style>
+@font-face{font-family:Newsreader;src:url(fonts/newsreader_400.ttf);font-weight:400}
+@font-face{font-family:Newsreader;src:url(fonts/newsreader_500.ttf);font-weight:500}
+@font-face{font-family:Inter;src:url(fonts/inter_400.ttf);font-weight:400}
+@font-face{font-family:Inter;src:url(fonts/inter_500.ttf);font-weight:500}
+@font-face{font-family:Inter;src:url(fonts/inter_600.ttf);font-weight:600}
+@font-face{font-family:Mono;src:url(fonts/jetbrains_mono_400.ttf);font-weight:400}
+
+:root{
+  --paper:#F6F2EC; --surface:#FCFAF6; --raised:#FFF; --sunken:#EFEAE1; --sidebar:#F1ECE4;
+  --border:#E3DCD0; --border-strong:#D2C9BA;
+  --text:#241F1B; --muted:#6A6257; --faint:#8C8375;
+  --accent:#B4522F; --accent-hover:#9C4526; --on-accent:#FFF;
+  --accent-soft:#F3E3D9; --accent-ink:#8E3D1F;
+  --success:#2F6B45; --warning:#8A5A12; --danger:#A3342B;
+  --code:#F2EDE4;
+}
+html.dark{
+  --paper:#1A1816; --surface:#211E1C; --raised:#2A2623; --sunken:#141211; --sidebar:#161413;
+  --border:#3A342F; --border-strong:#4A423B;
+  --text:#F1EBE3; --muted:#B3A99C; --faint:#8A8075;
+  --accent:#E08A66; --accent-hover:#EE9C79; --on-accent:#1A1816;
+  --accent-soft:#3A2A22; --accent-ink:#F0A585;
+  --success:#6FBF8E; --warning:#D9A441; --danger:#E4635A;
+  --code:#191715;
+}
+*{box-sizing:border-box}
+body{margin:0;background:#EDE8DF;font-family:Inter,system-ui,sans-serif;color:#241F1B;padding:32px 24px 64px}
+html.dark body{background:#100E0D;color:#F1EBE3}
+h1{font-family:Newsreader,Georgia,serif;font-weight:500;font-size:30px;margin:0 0 4px}
+.sub{color:#6A6257;font-size:14px;margin:0 0 28px;max-width:70ch;line-height:1.5}
+html.dark .sub{color:#B3A99C}
+.board{display:flex;flex-wrap:wrap;gap:28px;align-items:flex-start}
+.phone{width:390px;height:844px;border-radius:38px;background:var(--paper);color:var(--text);
+  border:1px solid var(--border);overflow:hidden;position:relative;display:flex;flex-direction:column;
+  box-shadow:0 24px 60px rgba(60,40,20,.14)}
+.phone.dk{box-shadow:0 24px 60px rgba(0,0,0,.5)}
+.caption{width:390px;font-size:12px;color:#6A6257;margin-top:8px;letter-spacing:.02em}
+html.dark .caption{color:#B3A99C}
+.frame{display:flex;flex-direction:column;gap:0}
+/* status + bars */
+.status{height:34px;display:flex;align-items:center;justify-content:space-between;padding:0 22px;font-size:11px;color:var(--muted);font-weight:500}
+.topbar{padding:6px 16px 10px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;background:var(--paper)}
+.iconbtn{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;color:var(--text);flex:none}
+.iconbtn.sm{width:34px;height:34px;border-radius:10px;background:var(--sunken);font-size:13px}
+.titles{flex:1;min-width:0}
+.title{font-size:15px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.meta{font-size:11px;color:var(--faint);margin-top:2px;display:flex;gap:8px;align-items:center}
+.dot{width:3px;height:3px;border-radius:50%;background:var(--faint);display:inline-block}
+.pill{display:inline-flex;align-items:center;gap:6px;height:28px;padding:0 10px;border-radius:999px;
+  background:var(--sunken);font-size:11.5px;font-weight:500;color:var(--text);border:1px solid transparent}
+.pill.soft{background:var(--accent-soft);color:var(--accent-ink)}
+.pill.out{background:transparent;border-color:var(--border)}
+.mono{font-family:Mono,monospace;font-size:11.5px}
+/* transcript */
+.body{flex:1;overflow:hidden;padding:14px 18px 8px;display:flex;flex-direction:column;gap:12px}
+.user{align-self:flex-end;max-width:86%;background:var(--sunken);border-radius:16px;padding:10px 13px;font-size:14px;line-height:1.45}
+.ai{font-size:14px;line-height:1.55}
+.ai p{margin:0 0 8px}
+.h{font-family:Newsreader,Georgia,serif;font-size:19px;font-weight:500;margin:2px 0 6px}
+.think{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:12.5px;padding:6px 0}
+.think .tri{font-size:9px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:12px 13px}
+.tool{display:flex;gap:10px;align-items:flex-start}
+.glyph{width:30px;height:30px;border-radius:9px;background:var(--accent-soft);color:var(--accent-ink);
+  display:grid;place-items:center;font-size:13px;flex:none}
+.tool .t{font-size:13.5px;font-weight:500}
+.tool .s{font-family:Mono,monospace;font-size:11.5px;color:var(--muted);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ok{color:var(--success);font-size:12px}
+.counts{font-family:Mono,monospace;font-size:11.5px;color:var(--muted)}
+.diff{border-radius:14px;overflow:hidden;border:1px solid var(--border);background:var(--code)}
+.diffhead{display:flex;align-items:center;gap:8px;padding:9px 12px;background:var(--surface);border-bottom:1px solid var(--border)}
+.diffhead .p{font-family:Mono,monospace;font-size:11.5px;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.add{color:var(--success)} .del{color:var(--danger)}
+pre{margin:0;padding:9px 12px;font-family:Mono,monospace;font-size:11.5px;line-height:1.55;overflow:hidden}
+pre .ln{color:var(--faint)}
+.code{background:var(--code);border-radius:12px;padding:10px 12px}
+.actions{display:flex;gap:8px;margin-top:10px}
+.btn{height:40px;border-radius:12px;padding:0 14px;display:inline-flex;align-items:center;gap:6px;
+  font-size:13px;font-weight:500;border:1px solid transparent}
+.btn.primary{background:var(--accent);color:var(--on-accent)}
+.btn.quiet{background:transparent;border-color:var(--border-strong);color:var(--text)}
+.btn.danger{background:transparent;border-color:var(--border-strong);color:var(--danger)}
+.verify{border-left:3px solid var(--success)}
+.approval{border-color:var(--accent);background:var(--surface)}
+.qopt{border:1px solid var(--border-strong);border-radius:12px;padding:10px 12px;font-size:13.5px;display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.qopt.sel{border-color:var(--accent);background:var(--accent-soft);color:var(--accent-ink)}
+/* composer */
+.composer{padding:8px 12px 14px;border-top:1px solid var(--border);background:var(--paper)}
+.queue{font-size:11.5px;color:var(--muted);margin:0 2px 6px;display:flex;gap:6px;align-items:center}
+.field{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:10px 12px}
+.field .ph{color:var(--faint);font-size:14px}
+.field .row{display:flex;align-items:center;gap:8px;margin-top:10px}
+.ring{width:26px;height:26px;border-radius:50%;border:2px solid var(--border-strong);position:relative;flex:none}
+.ring:after{content:"";position:absolute;inset:-2px;border-radius:50%;
+  background:conic-gradient(var(--accent) 0 34%, transparent 34% 100%);
+  -webkit-mask:radial-gradient(circle, transparent 9px, #000 10px);mask:radial-gradient(circle, transparent 9px, #000 10px)}
+.send{width:36px;height:36px;border-radius:12px;background:var(--accent);color:var(--on-accent);display:grid;place-items:center;margin-left:auto;font-size:15px}
+/* welcome */
+.welcome{padding:26px 22px;display:flex;flex-direction:column;gap:16px;flex:1}
+.mark{width:46px;height:46px}
+.greet{font-family:Newsreader,Georgia,serif;font-size:29px;line-height:1.2;font-weight:500;margin:0}
+.greet .soft{color:var(--muted)}
+.pick{display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:11px 13px}
+.pick .g{width:30px;height:30px;border-radius:9px;background:var(--accent-soft);display:grid;place-items:center;color:var(--accent-ink);font-size:12px}
+.pick .n{font-size:13.5px;font-weight:500}
+.pick .m{font-size:11px;color:var(--faint);margin-top:2px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1px solid var(--border);background:var(--surface);border-radius:999px;padding:8px 12px;font-size:12.5px;color:var(--text)}
+.sect{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);font-weight:600}
+.rowitem{display:flex;align-items:center;gap:12px;padding:11px 2px;border-bottom:1px solid var(--border)}
+.rowitem:last-child{border-bottom:none}
+.rowitem .g{width:34px;height:34px;border-radius:10px;background:var(--accent-soft);color:var(--accent-ink);display:grid;place-items:center;font-size:13px;flex:none}
+.rowitem .n{font-size:14px;font-weight:500}
+.rowitem .m{font-size:11.5px;color:var(--muted);margin-top:2px}
+.spacer{flex:1}
+/* drawer */
+.drawer{position:absolute;inset:0;display:flex}
+.scrim{flex:1;background:rgba(20,16,12,.35)}
+.panel{width:300px;background:var(--sidebar);border-right:1px solid var(--border);padding:16px 12px;display:flex;flex-direction:column;gap:10px}
+.search{display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:9px 11px;color:var(--faint);font-size:13px}
+.newbtn{height:44px;border-radius:12px;background:var(--accent);color:var(--on-accent);display:flex;align-items:center;gap:8px;justify-content:center;font-size:14px;font-weight:600}
+.navrow{display:flex;align-items:center;gap:10px;padding:10px 8px;border-radius:10px;font-size:13.5px;color:var(--text)}
+.navrow.act{background:var(--accent-soft);color:var(--accent-ink);font-weight:600}
+.grp{font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);font-weight:600;padding:10px 8px 4px}
+.sess{display:flex;align-items:center;gap:8px;padding:8px;border-radius:10px;font-size:13px}
+.sess .t{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tag{font-size:10px;padding:2px 6px;border-radius:6px;background:var(--sunken);color:var(--muted)}
+/* panels / hubs */
+.hubhead{display:flex;align-items:center;gap:10px;padding:8px 16px 12px;border-bottom:1px solid var(--border)}
+.hubhead .t{font-size:16px;font-weight:600;flex:1}
+.list{display:flex;flex-direction:column;gap:10px;padding:14px 16px;overflow:hidden}
+.stat{display:flex;gap:10px}
+.stat .card{flex:1}
+.stat .k{font-size:11px;color:var(--faint);text-transform:uppercase;letter-spacing:.06em;font-weight:600}
+.stat .v{font-family:Newsreader,Georgia,serif;font-size:21px;margin-top:4px}
+.badge{font-size:10px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;padding:3px 7px;border-radius:6px;background:var(--accent-soft);color:var(--accent-ink)}
+.badge.g{background:rgba(47,107,69,.14);color:var(--success)}
+.badge.r{background:rgba(163,52,43,.14);color:var(--danger)}
+textarea{width:100%;border:1px solid var(--border-strong);background:var(--surface);border-radius:12px;
+  padding:10px;font-family:Inter;font-size:13px;color:var(--text);height:64px;resize:none}
+</style>
+</head>
+<body>
+<h1>Harness Code — design board</h1>
+<p class="sub">Six frames drawn from the Compose layout code with the real tokens and the shipped font files.
+Layout board, not device screenshots — a device or emulator was not available in this environment; the opt-in
+“Compose UI tests (emulator)” CI job is where real captures come from.</p>
+
+<div class="board">
+
+  <!-- 1. Welcome, light -->
+  <div class="frame">
+  <div class="phone">
+    <div class="status"><span>9:41</span><span>◍ ⏻ ▮</span></div>
+    <div class="topbar">
+      <div class="iconbtn">≡</div>
+      <div class="titles"><div class="title">New session</div><div class="meta">Home</div></div>
+      <div class="pill out mono">main</div>
+    </div>
+    <div class="welcome">
+      <svg class="mark" viewBox="0 0 108 108" aria-label="Harness Code mark">
+        <circle cx="54" cy="54" r="4.5" fill="#B4522F"/>
+        <path d="M70.85,68.14 A22,22 0 1 1 70.85,39.86" fill="none" stroke="#B4522F" stroke-width="9" stroke-linecap="round"/>
+      </svg>
+      <div>
+        <p class="greet">Good evening.</p>
+        <p class="greet soft">What are we building?</p>
+      </div>
+      <div class="pick">
+        <div class="g">▤</div>
+        <div style="flex:1">
+          <div class="n">harness-code</div>
+          <div class="m">~/projects/harness-code</div>
+        </div>
+        <div class="tag">main</div>
+      </div>
+      <div class="chips">
+        <div class="chip">Fix the failing unit test</div>
+        <div class="chip">Review my diff</div>
+        <div class="chip">Explain this repo</div>
+        <div class="chip">Plan a feature</div>
+      </div>
+      <div class="sect" style="margin-top:6px">Running now</div>
+      <div class="card">
+        <div class="tool">
+          <div class="glyph">▸</div>
+          <div style="flex:1;min-width:0">
+            <div class="t">Reading 6 files</div>
+            <div class="s">gradle · SessionGrouping.kt</div>
+          </div>
+          <div class="ok">● 1m 12s</div>
+        </div>
+      </div>
+      <div class="sect" style="margin-top:6px">Recent</div>
+      <div class="rowitem"><div class="g">◆</div><div style="flex:1"><div class="n">Worktree isolation for sessions</div><div class="m">harness-code · 3m ago</div></div></div>
+      <div class="rowitem"><div class="g">◆</div><div style="flex:1"><div class="n">Diff review comments</div><div class="m">harness-code · 2h ago</div></div></div>
+    </div>
+    <div class="composer">
+      <div class="field">
+        <div class="ph">Ask, plan or build…</div>
+        <div class="row">
+          <div class="pill out">+</div>
+          <div class="pill soft">Ask</div>
+          <div class="ring"></div>
+          <div class="send">↑</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="caption">1 · Welcome, light — greeting, project picker, suggestions, live run</div>
+  </div>
+
+  <!-- 2. Session, light -->
+  <div class="frame">
+  <div class="phone">
+    <div class="status"><span>9:41</span><span>◍ ⏻ ▮</span></div>
+    <div class="topbar">
+      <div class="iconbtn">≡</div>
+      <div class="titles">
+        <div class="title">Worktree isolation</div>
+        <div class="meta"><span>harness-code</span><span class="dot"></span><span class="mono">harness/4a121b73</span></div>
+      </div>
+      <div class="iconbtn sm">⋯</div>
+    </div>
+    <div class="body">
+      <div class="user">Add a worktree_create tool so each session can work on its own branch.</div>
+      <div class="think"><span class="tri">▸</span> Thought for 6s</div>
+      <div class="ai">
+        <p>I’ll add a worktree manager plus three tools, then wire cleanup to session delete.</p>
+        <div class="h">Plan</div>
+        <p style="color:var(--muted);margin:0">1 · WorktreeManager (pure commands)<br>2 · tools: create / remove / list<br>3 · cleanup on session delete</p>
+      </div>
+      <div class="card approval">
+        <div class="tool" style="margin-bottom:10px">
+          <div class="glyph">⌘</div>
+          <div style="flex:1"><div class="t">Run command</div><div class="s">git worktree add -b feature/wt …</div></div>
+          <div class="counts">+0 −0</div>
+        </div>
+        <div class="actions" style="margin-top:0">
+          <div class="btn primary">Approve</div>
+          <div class="btn quiet">Always</div>
+          <div class="btn danger">Reject</div>
+        </div>
+      </div>
+      <div class="diff">
+        <div class="diffhead">
+          <span class="mono p">app/…/workspace/WorktreeManager.kt</span>
+          <span class="add mono">+142</span><span class="del mono">−0</span>
+        </div>
+<pre><span class="ln">101</span> suspend fun create(fs: WorkspaceFs, branch: String) {
+<span class="ln">102</span>   <span class="add">+  val path = worktreePath(root, branch)</span>
+<span class="ln">103</span>   <span class="add">+  root.mkdirs()</span>
+<span class="ln">104</span>     val add = run(fs, addCommand(path, branch))</pre>
+        <div style="display:flex;gap:8px;padding:0 12px 11px">
+          <div class="btn quiet" style="height:34px;font-size:12px">Review</div>
+          <div class="btn quiet" style="height:34px;font-size:12px">Comment</div>
+          <div class="btn quiet" style="height:34px;font-size:12px">Rewind</div>
+        </div>
+      </div>
+      <div class="card verify">
+        <div class="tool">
+          <div class="glyph" style="background:rgba(47,107,69,.14);color:var(--success)">✓</div>
+          <div style="flex:1"><div class="t">Verification</div><div class="s">gradlew testDebugUnitTest · 214 passed</div></div>
+          <div class="ok">✓</div>
+        </div>
+      </div>
+    </div>
+    <div class="composer">
+      <div class="queue">↳ 1 queued · “and add a test for branch-in-use”</div>
+      <div class="field">
+        <div class="ph">Reply, or queue a message…</div>
+        <div class="row">
+          <div class="pill out">+</div>
+          <div class="pill soft">Auto-edit</div>
+          <div class="pill mono">claude-sonnet-4.5</div>
+          <div class="ring"></div>
+          <div class="send">■</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="caption">2 · Session, light — thinking, approval, diff card, verification, queue</div>
+  </div>
+
+  <!-- 3. Session, dark -->
+  <div class="frame">
+  <div class="phone dk" id="darkphone">
+    <div class="status"><span>9:41</span><span>◍ ⏻ ▮</span></div>
+    <div class="topbar">
+      <div class="iconbtn">≡</div>
+      <div class="titles">
+        <div class="title">Fix failing checks</div>
+        <div class="meta"><span>harness-code</span><span class="dot"></span><span class="mono">main</span></div>
+      </div>
+      <div class="iconbtn sm">⋯</div>
+    </div>
+    <div class="body">
+      <div class="user">The CI checks on #1 are failing — fix them.</div>
+      <div class="card">
+        <div class="tool">
+          <div class="glyph">◫</div>
+          <div style="flex:1;min-width:0">
+            <div class="t">Read 3 files</div>
+            <div class="s">HarnessPanels.kt · WorktreeManager.kt</div>
+          </div>
+          <div class="ok">✓</div>
+        </div>
+      </div>
+      <div class="ai">
+        <p>Two compile errors: a <span class="mono">File(root)</span> misuse and a suspend call from
+        a click handler. Fixing both.</p>
+      </div>
+      <div class="code"><pre style="padding:0"><span class="del">− File(root).mkdirs()</span>
+<span class="add">+ root.mkdirs()</span></pre></div>
+      <div class="think"><span class="tri">▾</span> Thought for 9s</div>
+      <div class="ai" style="color:var(--muted);font-size:13.5px">
+        <p style="margin:0">Both keep engine behaviour identical — only call sites change.</p>
+      </div>
+      <div class="card">
+        <div class="tool">
+          <div class="glyph" style="background:var(--sunken)">⌘</div>
+          <div style="flex:1;min-width:0">
+            <div class="t">gradlew :app:testDebugUnitTest</div>
+            <div class="s">214 passed · 0 failed</div>
+          </div>
+          <div class="ok">✓</div>
+        </div>
+      </div>
+    </div>
+    <div class="composer">
+      <div class="field">
+        <div class="ph">Reply…</div>
+        <div class="row">
+          <div class="pill out">+</div>
+          <div class="pill soft">Plan</div>
+          <div class="pill mono">gpt-5-codex</div>
+          <div class="ring"></div>
+          <div class="send">↑</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="caption">3 · Session, dark — warm ink surfaces, same hierarchy</div>
+  </div>
+
+  <!-- 4. Diff review -->
+  <div class="frame">
+  <div class="phone">
+    <div class="status"><span>9:41</span><span>◍ ⏻ ▮</span></div>
+    <div class="hubhead"><div class="t">Diff review</div><div class="iconbtn sm">✕</div></div>
+    <div class="list">
+      <div class="diffhead" style="border:1px solid var(--border);border-radius:12px;background:var(--surface)">
+        <span class="mono p">app/src/main/…/PluginManifest.kt</span>
+        <span class="add mono">+38</span><span class="del mono">−6</span>
+      </div>
+      <div class="diff">
+<pre style="padding:12px"><span class="ln">88</span>  fun inspect(root: File): PluginContents? {
+<span class="ln">89</span> <span class="del">−  val dir = File(root, "hooks")</span>
+<span class="ln">90</span> <span class="add">+  val dir = root.resolve("hooks")</span>
+<span class="ln">91</span> <span class="add">+  val command = root.resolve("commands")</span>
+<span class="ln">92</span>    return PluginContents(hooks = list(dir),</pre>
+      </div>
+      <div class="card">
+        <div class="sect" style="margin-bottom:6px">Comment on line 91</div>
+        <textarea>This duplicates the loader in PluginStore — can we reuse it?</textarea>
+        <div class="actions">
+          <div class="btn primary" style="height:36px;font-size:12.5px">Send to agent</div>
+          <div class="btn quiet" style="height:36px;font-size:12.5px">Next file</div>
+        </div>
+      </div>
+      <div class="card" style="background:var(--sunken);border-color:transparent">
+        <div class="sect" style="margin-bottom:4px">Review sent</div>
+        <div style="font-size:13px;color:var(--muted)">1 comment on PluginManifest.kt is queued as a user turn.</div>
+      </div>
+    </div>
+    <div class="composer">
+      <div class="field"><div class="ph">Ask about this diff…</div>
+        <div class="row"><div class="pill out">+</div><div class="pill soft">Ask</div><div class="send">↑</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="caption">4 · Diff review — inline comment becomes a user turn</div>
+  </div>
+
+  <!-- 5. Drawer -->
+  <div class="frame">
+  <div class="phone">
+    <div class="status" style="background:var(--sidebar)"><span>9:41</span><span>◍ ⏻ ▮</span></div>
+    <div class="drawer">
+      <div class="panel">
+        <div style="display:flex;align-items:center;gap:9px;padding:2px 8px 4px">
+          <svg width="24" height="24" viewBox="0 0 108 108"><circle cx="54" cy="54" r="4.5" fill="var(--accent)"/>
+            <path d="M70.85,68.14 A22,22 0 1 1 70.85,39.86" fill="none" stroke="var(--accent)" stroke-width="9" stroke-linecap="round"/></svg>
+          <span style="font-family:Newsreader;font-size:18px">Harness Code</span>
+        </div>
+        <div class="search">⌕ Search sessions &amp; settings</div>
+        <div class="newbtn">+ New session</div>
+        <div class="navrow act">◆ Sessions</div>
+        <div class="grp">Pinned</div>
+        <div class="sess"><span>📌</span><span class="t">Worktree isolation</span><span class="tag">run</span></div>
+        <div class="grp">Today</div>
+        <div class="sess"><span>✦</span><span class="t">Diff review comments</span></div>
+        <div class="sess"><span>✦</span><span class="t">Fix failing checks</span></div>
+        <div class="grp">Yesterday</div>
+        <div class="sess"><span>✦</span><span class="t">Plan the memory rename</span></div>
+        <div class="grp">Earlier</div>
+        <div class="sess"><span>✦</span><span class="t">Terminal tier fallback bug</span></div>
+        <div class="spacer"></div>
+        <div class="navrow">▤ Projects</div>
+        <div class="navrow">◷ Scheduled</div>
+        <div class="navrow">▦ Parallel sessions <span class="tag" style="margin-left:auto">1</span></div>
+        <div class="navrow">⚗ Labs &amp; Device</div>
+        <div class="navrow">⚙ Settings</div>
+      </div>
+      <div class="scrim"></div>
+    </div>
+  </div>
+  <div class="caption">5 · Drawer — grouped sessions, pin/archive, hubs</div>
+  </div>
+
+  <!-- 6. Labs & Device -->
+  <div class="frame">
+  <div class="phone">
+    <div class="status"><span>9:41</span><span>◍ ⏻ ▮</span></div>
+    <div class="hubhead"><div class="t">Labs &amp; Device</div><div class="iconbtn sm">✕</div></div>
+    <div class="list">
+      <div class="search">⌕ Search settings</div>
+      <div class="stat">
+        <div class="card"><div class="k">Shell tier</div><div class="v">Shizuku</div><div class="badge g" style="margin-top:6px">active</div></div>
+        <div class="card"><div class="k">Storage</div><div class="v">1.8 GB</div><div class="badge" style="margin-top:6px">worktrees</div></div>
+      </div>
+      <div class="card">
+        <div class="rowitem" style="border:none;padding:4px 0"><div class="g">◍</div><div style="flex:1"><div class="n">Local models</div><div class="m">GGUF, 3 loaded · GPU</div></div><div class="tag">›</div></div>
+        <div class="rowitem" style="border:none;padding:4px 0"><div class="g">⌁</div><div style="flex:1"><div class="n">9Router</div><div class="m">fallbacks, key rotation, proxy</div></div><div class="tag">›</div></div>
+        <div class="rowitem" style="border:none;padding:4px 0"><div class="g">✈</div><div style="flex:1"><div class="n">Telegram</div><div class="m">remote control · connected</div></div><div class="tag">›</div></div>
+        <div class="rowitem" style="border:none;padding:4px 0"><div class="g">⇅</div><div style="flex:1"><div class="n">FTP / SFTP</div><div class="m">sync workspaces</div></div><div class="tag">›</div></div>
+      </div>
+      <div class="card">
+        <div class="sect" style="margin-bottom:6px">Device access</div>
+        <div class="rowitem" style="border:none;padding:4px 0"><div style="flex:1"><div class="n">Root</div><div class="m">not granted</div></div><div class="badge">off</div></div>
+        <div class="rowitem" style="border:none;padding:4px 0"><div style="flex:1"><div class="n">Wireless ADB</div><div class="m">port 5555</div></div><div class="badge">off</div></div>
+        <div class="rowitem" style="border:none;padding:4px 0"><div style="flex:1"><div class="n">Linux environment</div><div class="m">proot · 1.2 GB</div></div><div class="badge g">ready</div></div>
+      </div>
+      <div class="card">
+        <div class="sect" style="margin-bottom:6px">Feel</div>
+        <div class="rowitem" style="border:none;padding:4px 0"><div style="flex:1"><div class="n">Canvas &amp; glass</div><div class="m">motion blur, haptics</div></div><div class="tag">›</div></div>
+        <div class="rowitem" style="border:none;padding:4px 0"><div style="flex:1"><div class="n">Caveman mode</div><div class="m">terse replies</div></div><div class="badge">off</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="caption">6 · Labs &amp; Device — every extra feature, unchanged, searchable</div>
+  </div>
+
+  <!-- 7. Worktrees + PR -->
+  <div class="frame">
+  <div class="phone">
+    <div class="status"><span>9:41</span><span>◍ ⏻ ▮</span></div>
+    <div class="hubhead"><div class="t">Worktrees</div><div class="iconbtn sm">✕</div></div>
+    <div class="list">
+      <div class="card">
+        <div class="sect" style="margin-bottom:6px">New worktree</div>
+        <textarea style="height:44px">feature/worktree-ui</textarea>
+        <div class="actions"><div class="btn primary">Create worktree</div></div>
+        <div style="font-size:11.5px;color:var(--faint);margin-top:8px">A branch already checked out elsewhere is refused. Worktrees use disk.</div>
+      </div>
+      <div class="card">
+        <div class="tool">
+          <div class="glyph">⑂</div>
+          <div style="flex:1;min-width:0">
+            <div class="t mono">feature/worktree-ui</div>
+            <div class="s">worktrees/harness-code-feature_worktree-ui · 184 MB</div>
+          </div>
+          <div class="badge g">ready</div>
+        </div>
+        <div class="actions"><div class="btn quiet" style="height:34px;font-size:12px">Open</div>
+          <div class="btn danger" style="height:34px;font-size:12px">Remove</div></div>
+      </div>
+      <div class="hubhead" style="border:none;padding:6px 0 0"><div class="t" style="font-size:14px">Pull requests</div></div>
+      <div class="card">
+        <div style="font-size:14px;font-weight:600">#1 Harness Code: shell, branding, agent features</div>
+        <div class="mono" style="font-size:11.5px;color:var(--muted);margin-top:4px">harness/4a121b73 → main</div>
+        <div style="display:flex;gap:8px;margin-top:8px;align-items:center"><span class="badge r">2 failing</span><span class="mono" style="font-size:11.5px;color:var(--muted)">8 checks</span></div>
+        <div style="margin-top:9px;font-size:12.5px;display:grid;gap:5px">
+          <div><span style="color:var(--success)">✓</span> Unit tests</div>
+          <div><span style="color:var(--danger)">✕</span> Lint, test and assemble</div>
+          <div><span style="color:var(--muted)">•</span> Compose UI tests (emulator)</div>
+        </div>
+        <div class="actions"><div class="btn primary" style="height:36px;font-size:12.5px">Fix failing checks</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="caption">7 · Worktree flow and PR monitoring</div>
+  </div>
+
+</div>
+
+<script>
+  // The dark frame is a scoped copy of the dark token set, so both themes show
+  // side by side on one board.
+  const dark = document.getElementById('darkphone');
+  const el = document.createElement('div');
+  el.className = 'phone dk';
+  const cs = getComputedStyle(document.documentElement);
+  dark.style.setProperty('--paper', '#1A1816');
+  dark.style.setProperty('--surface', '#211E1C');
+  dark.style.setProperty('--raised', '#2A2623');
+  dark.style.setProperty('--sunken', '#141211');
+  dark.style.setProperty('--sidebar', '#161413');
+  dark.style.setProperty('--border', '#3A342F');
+  dark.style.setProperty('--border-strong', '#4A423B');
+  dark.style.setProperty('--text', '#F1EBE3');
+  dark.style.setProperty('--muted', '#B3A99C');
+  dark.style.setProperty('--faint', '#8A8075');
+  dark.style.setProperty('--accent', '#E08A66');
+  dark.style.setProperty('--accent-hover', '#EE9C79');
+  dark.style.setProperty('--on-accent', '#1A1816');
+  dark.style.setProperty('--accent-soft', '#3A2A22');
+  dark.style.setProperty('--accent-ink', '#F0A585');
+  dark.style.setProperty('--success', '#6FBF8E');
+  dark.style.setProperty('--danger', '#E4635A');
+  dark.style.setProperty('--code', '#191715');
+</script>
+</body>
+</html>

@@ -179,7 +179,7 @@ class MainActivity : AppCompatActivity() {
                         container.browser.bindReadCaptureHost(host)
                         onDispose { container.browser.unbindReadCaptureHost(host) }
                     }
-                    AppNav(container)
+                    com.androidharness.app.ui.harness.HarnessCodeRoot(container)
                     com.androidharness.app.ui.common.StorageAccessPrompt()
                 }
 

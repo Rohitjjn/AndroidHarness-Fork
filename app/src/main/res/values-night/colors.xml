@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Warm ink behind the launcher mark in dark mode. -->
+    <color name="ic_launcher_background">#1A1816</color>
+    <color name="harness_splash_background">#1A1816</color>
+</resources>

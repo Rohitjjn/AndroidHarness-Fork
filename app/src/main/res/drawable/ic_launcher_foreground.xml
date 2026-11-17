@@ -1,15 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  Harness Code mark: an open coral loop with a solid centre dot — a harness
+  ring, drawn from scratch for this project. It shares no shape, stroke trick
+  or colour pair with Anthropic's starburst mark, and it is deliberately
+  geometric so it stays legible at 48dp.
+-->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="108dp"
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
-    <!-- chevron ">" -->
     <path
-        android:fillColor="#FFFFFFFF"
-        android:pathData="M32,34 L48,34 L68,54 L48,74 L32,74 L52,54 Z" />
-    <!-- underscore "_" -->
+        android:pathData="M70.85,68.14 A22,22 0 1 1 70.85,39.86"
+        android:strokeColor="#B4522F"
+        android:strokeWidth="9"
+        android:strokeLineCap="round"
+        android:fillColor="#00000000" />
     <path
-        android:fillColor="#FFFFFFFF"
-        android:pathData="M58,66 L82,66 L82,74 L58,74 Z" />
+        android:pathData="M54,49.5 a4.5,4.5 0 1,0 0.01,0 z"
+        android:fillColor="#B4522F" />
 </vector>

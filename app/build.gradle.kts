@@ -1,3 +1,4 @@
+import java.util.Base64
 import java.util.Properties
 import java.security.MessageDigest
 import java.util.zip.GZIPOutputStream
@@ -39,6 +40,22 @@ val hasNdk: Boolean = run {
     sdk.resolve("ndk/$pinnedNdk").isDirectory
 }
 
+/**
+ * Release signing inputs, read once.
+ *
+ * With HARNESS_KEYSTORE_BASE64 (+ HARNESS_KEYSTORE_PASSWORD, HARNESS_KEY_ALIAS,
+ * HARNESS_KEY_PASSWORD) present — GitHub Actions secrets — release builds are
+ * signed with that keystore. Without them the release keeps the existing debug
+ * key and labels itself "test-signed" in About and in the artifact name.
+ */
+val ciKeystoreBase64 = System.getenv("HARNESS_KEYSTORE_BASE64")?.takeIf { it.isNotBlank() }
+val ciKeystoreFile: File? = ciKeystoreBase64?.let { encoded ->
+    val file = File(layout.buildDirectory.asFile.get(), "ci-release.keystore")
+    file.parentFile.mkdirs()
+    file.writeBytes(Base64.getDecoder().decode(encoded))
+    file
+}
+
 android {
     if (distributionChannel == "play") dynamicFeatures += setOf(":local_gpu")
     sourceSets.getByName("main").java.srcDir("src/${distributionChannel}Delivery/java")
@@ -59,13 +76,17 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.androidharness.app"
+        // Installable next to the original AndroidHarness (different id, separate data).
+        // Signing is unchanged: release builds keep the debug-key config below, so
+        // switching the id cannot break an existing signature.
+        applicationId = "com.harnesscode.app"
         minSdk = 26
         targetSdk = 36
-        versionCode = 38
-        versionName = "3.4"
+        versionCode = 39
+        versionName = "1.0.0"
         buildConfigField("String", "GITHUB_CLIENT_ID", "\"$githubClientId\"")
         buildConfigField("boolean", "PLAY_DISTRIBUTION", (distributionChannel == "play").toString())
+        buildConfigField("String", "SIGNING_LABEL", "\"" + (if (ciKeystoreBase64 != null) "signed" else "test-signed") + "\"")
         if (hasNdk) {
             ndk { abiFilters += listOf("armeabi-v7a", "arm64-v8a", "x86", "x86_64") }
             externalNativeBuild {
@@ -90,14 +111,23 @@ android {
                 storeFile = stableDebugKey
             }
         }
+        if (ciKeystoreFile != null) {
+            create("ci") {
+                storeFile = ciKeystoreFile
+                storePassword = System.getenv("HARNESS_KEYSTORE_PASSWORD")
+                keyAlias = System.getenv("HARNESS_KEY_ALIAS") ?: "harness"
+                keyPassword = System.getenv("HARNESS_KEY_PASSWORD") ?: System.getenv("HARNESS_KEYSTORE_PASSWORD")
+            }
+        }
     }
 
     buildTypes {
         release {
-            // Local alpha distribution: signed with the debug keystore so the
-            // APK installs without a release keystore. Swap to a dedicated
-            // signing config before any public/Play distribution.
-            signingConfig = signingConfigs.getByName("debug")
+            // CI signs with the project keystore when its secrets exist; otherwise
+            // the debug key keeps the APK installable, and the About screen plus
+            // the artifact name both say "test-signed".
+            signingConfig = if (ciKeystoreFile != null) signingConfigs.getByName("ci")
+            else signingConfigs.getByName("debug")
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
@@ -131,6 +161,16 @@ android {
         // HarnessUserService.kt), an AGP/lint bug, not a lint finding. Skip
         // the release lint gate until the toolchain bug is fixed.
         checkReleaseBuilds = false
+        // The upstream codebase has never been linted (1142 files), so the task
+        // reports findings instead of failing the build. CI surfaces the error
+        // count and the first findings as annotations, and treats errors in the
+        // files this fork adds as a failure (see .github/workflows/harness-ci.yml).
+        abortOnError = false
+        // Lint's test-source models crash on this AGP/lint version (a
+        // configuration-cache serialisation bug in LintModelWriterTask), so the
+        // report covers app sources only.
+        checkTestSources = false
+        checkDependencies = false
     }
 
     compileOptions {
@@ -259,6 +299,12 @@ dependencies {
     androidTestImplementation(libs.androidx.test.runner)
     androidTestImplementation(libs.androidx.test.core)
     androidTestImplementation(libs.androidx.test.ext.junit)
+    // Compose UI test rule for the harness screenshot sheet (ui-tests CI job).
+    // androidTest configurations do not inherit the `implementation` platform,
+    // so the BOM has to be added here too.
+    androidTestImplementation(platform(libs.compose.bom))
+    androidTestImplementation("androidx.compose.ui:ui-test-junit4")
+    debugImplementation("androidx.compose.ui:ui-test-manifest")
 }
 
 // The hash is bundled in the base app, so neither a changed release manifest nor
