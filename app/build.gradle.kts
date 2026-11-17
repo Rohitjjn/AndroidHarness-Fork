@@ -1,3 +1,4 @@
+import java.util.Base64
 import java.util.Properties
 import java.security.MessageDigest
 import java.util.zip.GZIPOutputStream
@@ -51,7 +52,7 @@ val ciKeystoreBase64 = System.getenv("HARNESS_KEYSTORE_BASE64")?.takeIf { it.isN
 val ciKeystoreFile: File? = ciKeystoreBase64?.let { encoded ->
     val file = File(layout.buildDirectory.asFile.get(), "ci-release.keystore")
     file.parentFile.mkdirs()
-    file.writeBytes(java.util.Base64.getDecoder().decode(encoded))
+    file.writeBytes(Base64.getDecoder().decode(encoded))
     file
 }
 
