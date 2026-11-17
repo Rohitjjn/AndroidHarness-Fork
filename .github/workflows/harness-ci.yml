@@ -61,7 +61,7 @@ jobs:
         run: |
           mkdir -p ci-out/logs
           set -o pipefail
-          ./gradlew :app:testDebugUnitTest :app:assembleDebug --continue --no-daemon --stacktrace 2>&1 | tee ci-out/logs/test-and-debug.log
+          ./gradlew :app:testDebugUnitTest :app:assembleDebug :app:assembleDebugAndroidTest --continue --no-daemon --stacktrace 2>&1 | tee ci-out/logs/test-and-debug.log
 
       # Lint is reported, not gated: the toolchain's lint crashes inside its own
       # JavaDoc parser on this codebase (see app/build.gradle.kts), so a failing

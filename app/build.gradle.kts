@@ -294,6 +294,9 @@ dependencies {
     androidTestImplementation(libs.androidx.test.runner)
     androidTestImplementation(libs.androidx.test.core)
     androidTestImplementation(libs.androidx.test.ext.junit)
+    // Compose UI test rule for the harness screenshot sheet (ui-tests CI job).
+    androidTestImplementation("androidx.compose.ui:ui-test-junit4")
+    debugImplementation("androidx.compose.ui:ui-test-manifest")
 }
 
 // The hash is bundled in the base app, so neither a changed release manifest nor
