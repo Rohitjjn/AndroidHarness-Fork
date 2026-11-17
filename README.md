@@ -40,6 +40,9 @@ Design notes live in [`docs/harness-code/`](docs/harness-code):
 [PARITY](docs/harness-code/PARITY.md) ·
 [SKILLS](docs/harness-code/SKILLS.md).
 
+Pre-release APKs: [`harness-code-v1.0.0`](https://github.com/Rohitjjn/AndroidHarness-Fork/releases/tag/harness-code-v1.0.0)
+(CI-signed with the debug key, therefore labelled **test-signed**).
+
 ## Building
 
 ```bash

@@ -87,6 +87,48 @@ the behaviour really matches**; otherwise keep the AndroidHarness name.
 | Chat (research) section | Full Chat UI is in Classic; the new shell lists Chat conversations in the drawer and opens them in Classic. |
 | Screenshot tests | No Paparazzi/Roborazzi suite: the toolchain is AGP 9.3.1 + Compose BOM 2026.08 and neither plugin has a release for it that was verified here. Compose UI tests live in `app/src/androidTest` and run only in the opt-in emulator job. |
 
+## Verification status (what CI actually ran)
+
+Last verified commit: `1599da7` on `arena/4a121b73-androidharness-fork`, run
+[44051801529](https://github.com/Rohitjjn/AndroidHarness-Fork/actions/runs/44051801529) — **success**.
+
+| Check | Result |
+| --- | --- |
+| `:app:testDebugUnitTest` | **2297 tests run, 0 failed, 0 errors, 0 skipped**, including the five suites added by this fork |
+| `:app:assembleDebug` | APK produced (99 MB) |
+| `:app:assembleDebugAndroidTest` | compiles (one stale upstream file removed, see below) |
+| `:app:lintDebug` | 2490 pre-existing errors and 1333 warnings in upstream code; **0 errors in files added by this fork** |
+| `:app:assembleRelease` | APK produced (65 MB), **test-signed** (no keystore secrets in the repository) |
+| Pre-release | `harness-code-v1.0.0` published with both APKs by the `Pre-release with APKs` job |
+
+### Known gaps
+
+* **Lint is reported, not gated.** The upstream tree has never been linted, so
+  `:app:lintDebug` finds roughly 2490 `NewApi`-class errors in existing code. The
+  task runs on every push, CI prints the counts and the first findings as
+  annotations, and the job fails only if a **file added by this fork** has an
+  error. Lint's own test-source model crashes on this AGP version, so
+  `checkTestSources` and `checkDependencies` are off (`app/build.gradle.kts`).
+* **One stale upstream instrumented test was deleted:**
+  `app/src/androidTest/.../ui/chat/QuestionCardDeviceTest.kt` referenced
+  `ChatListTestActivity`, `Page`, `chosen`, `selectionTarget`, `write` and
+  `screenshot`, none of which exist in the tree any more, and it called
+  `QuestionCard(request) { … }` while the composable now takes
+  `(question, onAnswer, autoContinueAt)`. The androidTest source set therefore
+  never compiled, which is why the emulator job could not run before. No other
+  test file was touched.
+* **No device screenshots.** The environment had no device or emulator, and CI
+  artefacts are not downloadable from it, so the images in
+  `docs/harness-code/preview/index.html` are a hand-built design board (real
+  tokens, real font files), not device captures. The opt-in
+  `Compose UI tests (emulator)` job builds and installs the app and runs
+  `HarnessScreenshotDeviceTest`, which writes PNGs to
+  `Download/HarnessCodeScreens` and uploads them as `ui-screenshots`; that job
+  was **not** run for this branch.
+* Release signing falls back to the debug key (artefacts are named
+  `test-signed`) until `HARNESS_KEYSTORE_BASE64`, `HARNESS_KEYSTORE_PASSWORD`,
+  `HARNESS_KEY_ALIAS` and `HARNESS_KEY_PASSWORD` exist as repository secrets.
+
 ## Manual test steps
 
 ### Worktree flow
